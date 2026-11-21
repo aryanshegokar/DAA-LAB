@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define MAX 16
+#define INF 999999999
+
+int cost[MAX][MAX];
+int dp[1 << MAX][MAX];
+int n;
+
+int tsp(int mask, int city) {
+    if (dp[mask][city] != -1) return dp[mask][city];
+    if (mask == (1 << n) - 1) {
+        if (cost[city][0] < 0) return dp[mask][city] = INF;
+        return dp[mask][city] = cost[city][0];
+    }
+    int result = INF;
+    for (int next = 0; next < n; next++) {
+        if (!(mask & (1 << next)) && cost[city][next] >= 0) {
+            int sub = tsp(mask | (1 << next), next);
+            if (sub != INF && cost[city][next] + sub < result)
+                result = cost[city][next] + sub;
+        }
+    }
+    return dp[mask][city] = result;
+}
+
+int main() {
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            scanf("%d", &cost[i][j]);
+
+    for (int i = 0; i < (1 << n); i++)
+        for (int j = 0; j < n; j++)
+            dp[i][j] = -1;
+
+    printf("%d\n", tsp(1, 0));
+    return 0;
+}   
